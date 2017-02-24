@@ -63,6 +63,7 @@ set_guake_bg() {
 
 	if [ $rc -eq 0 ]; then
 		echo_lvl $verb_verbose "Guake background successfullly set."
+		echo_lvl $verb_normal "Visit: https://apod.nasa.gov/apod/astropix.html"
 	else
 		echo_err "Failed to set background."
 	fi
