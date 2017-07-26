@@ -11,7 +11,9 @@ consumption by `guake-apod.sh`.
 
 ## guake-apod.sh
 This script runs `apod-dl.py`, reading the output. If the download is successful,
-it proceeds to set the image as the Guake terminal background using `gconftool-2`.
+it appends the file name to the log (`apod.log`) in the same folder as the
+downloaded image. It then proceeds to set the image as the Guake terminal
+background via `gconftool-2`.
 
 ## Requirements
 * Python
