@@ -71,9 +71,19 @@ set_guake_bg() {
 	return $rc
 }
 
+# Add file name to APOD log
+log_apod() {
+	apod_path=$1
+	apod_folder=$(dirname $apod_path)
+	apod_file=$(basename $apod_path)
+	apod_log=${apod_path}/apod.log
+	echo $apod_file >> $apod_log
+}
+
 download_apod
 rc=$?
 if [ $rc -eq 0 ]; then
+	log_apod "$dl_response"
 	set_guake_bg "$dl_response"
 	rc=$?
 fi
