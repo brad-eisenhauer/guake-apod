@@ -76,7 +76,7 @@ log_apod() {
 	apod_path=$1
 	apod_folder=$(dirname $apod_path)
 	apod_file=$(basename $apod_path)
-	apod_log=${apod_path}/apod.log
+	apod_log=${apod_folder}/apod.log
 	echo $apod_file >> $apod_log
 }
 
