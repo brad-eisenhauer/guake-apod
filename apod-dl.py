@@ -10,10 +10,16 @@
 # folder in user's home directory, preserving the original file name.
 
 from __future__ import print_function
+from __future__ import division
 import urllib
 import os
 from HTMLParser import HTMLParser
 import sys
+import gtk
+from PIL import Image
+
+
+DEBUG=False
 
 class ApodHtmlParser( HTMLParser ):
     # url of full-sized APOD
@@ -43,8 +49,35 @@ def get_pictures_dir():
 def get_filename( image_url ):
     return image_url.split( '/' )[ -1 ]
 
+def dprint( *args, **kwargs ):
+    if (DEBUG == True):
+        print( *args, file=sys.stderr, **kwargs)
+
 def eprint( *args, **kwargs ):
     print( *args, file=sys.stderr, **kwargs )
+
+def resize_image(image_file):
+    target_size = (gtk.gdk.screen_width(), gtk.gdk.screen_height())
+    outfile = os.path.splitext(image_file)[0] + ".resize.jpg"
+    try:
+        im = Image.open(image_file)
+        dprint(str(im.size) + " => " + str(target_size))
+        dprint(target_size[0] / im.size[0])
+        dprint(target_size[1] / im.size[1])
+        resize_ratio = max(target_size[0] / im.size[0],
+                target_size[1] / im.size[1])
+        dprint(resize_ratio)
+        if (resize_ratio > 1):
+            return image_file
+        target_size = (round(im.size[0] * resize_ratio),
+                round(im.size[1] * resize_ratio))
+        dprint(target_size)
+        im.thumbnail(target_size)
+        im.save(outfile, "JPEG")
+        return outfile
+    except IOError:
+        eprint("Cannot resize '%s'", image_file)
+    return image_file
 
 def main():
     url = get_image_url()
@@ -54,6 +87,7 @@ def main():
     dlfile = get_pictures_dir() + '/apod/' + get_filename( url )
     if not os.path.exists( dlfile ):
         urllib.urlretrieve( url, dlfile )
+        dlfile = resize_image(dlfile)
     print( dlfile )
     return 0
 
