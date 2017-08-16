@@ -82,7 +82,7 @@ def resize_image(image_file):
         to_size = get_resize_dims(im)
         if (im.size == to_size):
             return image_file
-        im.thumbnail(target_size)
+        im.thumbnail(to_size)
         im.save(outfile, "JPEG")
         return outfile
     except IOError:
