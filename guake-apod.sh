@@ -41,7 +41,7 @@ dl_response=''
 download_apod() {
 	echo_lvl $verb_verbose "Downloading APOD..."
 
-	dl_response=$(apod-dl.py)
+	dl_response=$(./apod-dl.py)
 	rc=$?
 
 	if [ $rc -eq 0 ]; then
@@ -76,7 +76,7 @@ log_apod() {
 	apod_path=$1
 	apod_folder=$(dirname $apod_path)
 	apod_file=$(basename $apod_path)
-	apod_log=${apod_path}/apod.log
+	apod_log=${apod_folder}/apod.log
 	echo $apod_file >> $apod_log
 }
 
