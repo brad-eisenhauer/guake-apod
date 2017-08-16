@@ -97,7 +97,7 @@ def main():
     dlfile = get_pictures_dir() + '/apod/' + get_filename( url )
     if not os.path.exists( dlfile ):
         urllib.urlretrieve( url, dlfile )
-    dlfile = resize_image(dlfile)
+        dlfile = resize_image(dlfile)
     print( dlfile )
     return 0
 
