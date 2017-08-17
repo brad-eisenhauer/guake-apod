@@ -10,10 +10,19 @@
 # folder in user's home directory, preserving the original file name.
 
 from __future__ import print_function
-import urllib
-import os
+from __future__ import division
+
 from HTMLParser import HTMLParser
+from PIL import Image
+
+import gtk
+import operator
+import os
 import sys
+import urllib
+
+
+DEBUG=False
 
 class ApodHtmlParser( HTMLParser ):
     # url of full-sized APOD
@@ -43,8 +52,42 @@ def get_pictures_dir():
 def get_filename( image_url ):
     return image_url.split( '/' )[ -1 ]
 
+def dprint( *args, **kwargs ):
+    if (DEBUG == True):
+        print( *args, file=sys.stderr, **kwargs)
+
 def eprint( *args, **kwargs ):
     print( *args, file=sys.stderr, **kwargs )
+
+def get_resize_dims(image):
+    """Calculate dimensions of resized image based on original image dimensions
+        and current screen resolution. If possible, shrink the image so that the
+        entire screen fits within the image, but either the width or height of
+        the image matches the corresponding dimension of the screen. Do not
+        enlarge the image."""
+    target_size = (gtk.gdk.screen_width(), gtk.gdk.screen_height())
+    resize_ratio = max(tar / src for tar, src in zip(target_size, image.size))
+    if (resize_ratio > 1):
+        return image.size
+    return tuple(round(resize_ratio * d) for d in image.size)
+    
+def resize_image(image_file):
+    """Create a resized copy of image_file with extension '.resize/jpg'. Return
+        the name of the resized image. If dimensions to resize to are the same
+        the original dimensions, do not create a copy and return instead the
+        original file name."""
+    outfile = os.path.splitext(image_file)[0] + '.resize.jpg'
+    try:
+        im = Image.open(image_file)
+        to_size = get_resize_dims(im)
+        if (im.size == to_size):
+            return image_file
+        im.thumbnail(to_size)
+        im.save(outfile, "JPEG")
+        return outfile
+    except IOError:
+        eprint('Cannot resize "%s"', image_file)
+    return image_file
 
 def main():
     url = get_image_url()
@@ -54,6 +97,7 @@ def main():
     dlfile = get_pictures_dir() + '/apod/' + get_filename( url )
     if not os.path.exists( dlfile ):
         urllib.urlretrieve( url, dlfile )
+        dlfile = resize_image(dlfile)
     print( dlfile )
     return 0
 

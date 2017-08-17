@@ -41,7 +41,7 @@ dl_response=''
 download_apod() {
 	echo_lvl $verb_verbose "Downloading APOD..."
 
-	dl_response=$(apod-dl.py)
+	dl_response=$(./apod-dl.py)
 	rc=$?
 
 	if [ $rc -eq 0 ]; then
