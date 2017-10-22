@@ -80,11 +80,36 @@ log_apod() {
 	echo $apod_file >> $apod_log
 }
 
-download_apod
-rc=$?
-if [ $rc -eq 0 ]; then
-	log_apod "$dl_response"
-	set_guake_bg "$dl_response"
+revert() {
+	apod_folder=~/Pictures/apod
+	apod_log=${apod_folder}/apod.log
+	echo_lvl $verb_debug "Reading log ${apod_log}"
+	# drop last line from APOD log
+	sed -i '$ d' ${apod_log}
+	# get last file name in log
+	apod_file=$(tail -n 1 ${apod_log})
+	echo_lvl $verb_debug "Reverting to ${apod_file}"
+	set_guake_bg ${apod_folder}/${apod_file}
+}
+
+get_new_bg() {
+	download_apod
 	rc=$?
-fi
-exit $rc
+	if [ $rc -eq 0 ]; then
+		log_apod "$dl_response"
+		set_guake_bg "$dl_response"
+		rc=$?
+	fi
+	exit $rc
+}
+
+case "$1" in
+	"-r")
+		revert
+		;;
+	"--revert")
+		revert
+		;;
+	*)
+		get_new_bg
+esac
